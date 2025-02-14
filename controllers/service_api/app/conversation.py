@@ -1,3 +1,4 @@
+from flask import request
 from flask_restful import Resource, marshal_with, reqparse
 from flask_restful.inputs import int_range
 from werkzeug.exceptions import NotFound
@@ -88,7 +89,40 @@ class ConversationRenameApi(Resource):
         except services.errors.conversation.ConversationNotExistsError:
             raise NotFound("Conversation Not Exists.")
 
+class ConversationDeleteBulkApi(Resource):
+
+    @validate_app_token(fetch_user_arg=FetchUserArg(fetch_from=WhereisUserArg.JSON))
+    @marshal_with(conversation_delete_fields)
+    def delete(self, app_model: App, end_user: EndUser):
+        # 获取应用模式
+        app_mode = AppMode.value_of(app_model.mode)
+        if app_mode not in {AppMode.CHAT, AppMode.AGENT_CHAT, AppMode.ADVANCED_CHAT}:
+            raise NotChatAppError()
+
+        # 从请求体中获取 c_ids 和 user 参数
+        data = request.get_json()
+        c_ids = data.get("c_ids", [])
+
+        if not c_ids:
+            return {"result": "failure", "message": "No conversation ids provided."}, 400
+
+        # 记录删除失败的会话 ID
+        failed_ids = []
+
+        for conversation_id in c_ids:
+            try:
+                # 删除单个会话
+                ConversationService.delete(app_model, str(conversation_id), end_user)
+            except services.errors.conversation.ConversationNotExistsError:
+                failed_ids.append(str(conversation_id))  # 记录删除失败的 ID
+
+        if failed_ids:
+            # 如果有删除失败的 ID，返回失败的 ID 列表
+            return {"result": "failure", "failed_ids": failed_ids}, 400
+
+        return {"result": "success"}, 200
 
 api.add_resource(ConversationRenameApi, "/conversations/<uuid:c_id>/name", endpoint="conversation_name")
 api.add_resource(ConversationApi, "/conversations")
+api.add_resource(ConversationDeleteBulkApi, "/conversations/delete_bulk")
 api.add_resource(ConversationDetailApi, "/conversations/<uuid:c_id>", endpoint="conversation_detail")

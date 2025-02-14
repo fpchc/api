@@ -653,7 +653,15 @@ class Conversation(db.Model):
             .count()
         )
 
-        return {"like": like, "dislike": dislike}
+        contents = (
+            db.session.query(MessageFeedback.content)
+            .filter(MessageFeedback.conversation_id == self.id,
+                    MessageFeedback.from_source == "user",
+                    MessageFeedback.content.isnot(None),)
+            .all()
+        )
+
+        return {"like": like, "dislike": dislike, "contents": contents}
 
     @property
     def admin_feedback_stats(self):

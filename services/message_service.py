@@ -151,7 +151,7 @@ class MessageService:
 
     @classmethod
     def create_feedback(
-        cls, app_model: App, message_id: str, user: Optional[Union[Account, EndUser]], rating: Optional[str]
+        cls, app_model: App, message_id: str, user: Optional[Union[Account, EndUser]], rating: Optional[str], content: Optional[str],
     ) -> MessageFeedback:
         if not user:
             raise ValueError("user cannot be None")
@@ -175,6 +175,7 @@ class MessageService:
                 from_source=("user" if isinstance(user, EndUser) else "admin"),
                 from_end_user_id=(user.id if isinstance(user, EndUser) else None),
                 from_account_id=(user.id if isinstance(user, Account) else None),
+                content=content,
             )
             db.session.add(feedback)
 
