@@ -1,6 +1,8 @@
 import json
 import logging
+import os
 
+import requests
 from flask import abort, request
 from flask_restful import Resource, marshal_with, reqparse
 from werkzeug.exceptions import Forbidden, InternalServerError, NotFound
@@ -25,6 +27,25 @@ from services.errors.app import WorkflowHashNotEqualError
 from services.workflow_service import WorkflowService
 
 logger = logging.getLogger(__name__)
+
+def sync_workflow_request(app_id: str, features: dict):
+    api_token = os.getenv("CONSUMER_API_TOKEN")
+    url_prefix = os.getenv("CONSUMER_API_PREFIX") + "/admin/apps/workflow/sync"
+    headers = {
+        'Authorization': f'Bearer {api_token}',
+        'Content-Type': 'application/json; charset=UTF-8'  # 指定编码为 UTF-8
+    }
+    body = {
+        "app_id": app_id,
+        "features": features,
+    }
+    response = requests.post(url_prefix, json=body, headers=headers)
+
+    # 检查请求是否成功
+    if response.status_code == 200:
+        logging.info('成功:', response.json())  # 打印响应的 JSON 数据
+    else:
+        logging.error('请求失败，状态码:', response.status_code)
 
 
 class DraftWorkflowApi(Resource):
@@ -118,6 +139,7 @@ class DraftWorkflowApi(Resource):
         except WorkflowHashNotEqualError:
             raise DraftWorkflowNotSync()
 
+        sync_workflow_request(app_id=app_model.id, features=args["features"])
         return {
             "result": "success",
             "hash": workflow.unique_hash,
