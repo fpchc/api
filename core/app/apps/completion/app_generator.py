@@ -139,7 +139,6 @@ class CompletionAppGenerator(MessageBasedAppGenerator):
             invoke_from=invoke_from,
             extras=extras,
             trace_manager=trace_manager,
-            parent_message_id = args.get("parent_message_id") or UUID_NIL,
         )
 
         # init generate records
