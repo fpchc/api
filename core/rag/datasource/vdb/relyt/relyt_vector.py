@@ -57,7 +57,7 @@ class RelytVector(BaseVector):
         self._url = (
             f"postgresql+psycopg2://{config.user}:{config.password}@{config.host}:{config.port}/{config.database}"
         )
-        self.client = create_engine(self._url)
+        self.client = create_engine(self._url, echo=True)
         self._fields = []
         self._group_id = group_id
 

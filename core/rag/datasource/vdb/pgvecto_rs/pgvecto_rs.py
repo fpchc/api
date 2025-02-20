@@ -54,7 +54,7 @@ class PGVectoRS(BaseVector):
         self._url = (
             f"postgresql+psycopg2://{config.user}:{config.password}@{config.host}:{config.port}/{config.database}"
         )
-        self._client = create_engine(self._url)
+        self._client = create_engine(self._url, echo=True)
         with Session(self._client) as session:
             session.execute(text("CREATE EXTENSION IF NOT EXISTS vectors"))
             session.commit()
