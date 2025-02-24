@@ -39,6 +39,13 @@ class AppIconUrlField(fields.Raw):
         if isinstance(obj, App | Site | Advertising) and obj.icon_type == IconType.IMAGE.value:
             return file_helpers.get_signed_file_url(obj.icon)
         return None
+    
+class IconUrlField(fields.Raw):
+    def output(self, key, obj):
+        if obj is None:
+            return None
+
+        return file_helpers.get_signed_file_url(obj.id)
 
 
 class TimestampField(fields.Raw):

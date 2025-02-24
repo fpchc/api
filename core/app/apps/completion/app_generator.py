@@ -80,6 +80,8 @@ class CompletionAppGenerator(MessageBasedAppGenerator):
         query = args["query"]
         if not isinstance(query, str):
             raise ValueError("query must be a string")
+        
+        is_connected_to_network = args.get("is_connected_to_network", False)
 
         query = query.replace("\x00", "")
         inputs = args["inputs"]
@@ -133,6 +135,7 @@ class CompletionAppGenerator(MessageBasedAppGenerator):
                 user_inputs=inputs, variables=app_config.variables, tenant_id=app_model.tenant_id
             ),
             query=query,
+            is_connected_to_network=is_connected_to_network,
             files=file_objs,
             user_id=user.id,
             stream=streaming,

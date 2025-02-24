@@ -739,6 +739,8 @@ class Message(db.Model):
     _inputs: Mapped[dict] = mapped_column("inputs", db.JSON)
     query: Mapped[str] = db.Column(db.Text, nullable=False)
     message = db.Column(db.JSON, nullable=False)
+    is_connected_to_network = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
+    network_message = db.Column(db.JSON, nullable=False)
     message_tokens = db.Column(db.Integer, nullable=False, server_default=db.text("0"))
     message_unit_price = db.Column(db.Numeric(10, 4), nullable=False)
     message_price_unit = db.Column(db.Numeric(10, 7), nullable=False, server_default=db.text("0.001"))

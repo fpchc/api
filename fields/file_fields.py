@@ -1,6 +1,6 @@
 from flask_restful import fields
 
-from libs.helper import TimestampField
+from libs.helper import IconUrlField, TimestampField
 
 upload_config_fields = {
     "file_size_limit": fields.Integer,
@@ -17,6 +17,7 @@ file_fields = {
     "size": fields.Integer,
     "extension": fields.String,
     "mime_type": fields.String,
+    "icon_url": IconUrlField,
     "created_by": fields.String,
     "created_at": TimestampField,
 }

@@ -94,6 +94,8 @@ class AdvancedChatAppGenerator(MessageBasedAppGenerator):
         query = args["query"]
         if not isinstance(query, str):
             raise ValueError("query must be a string")
+        
+        is_connected_to_network = args.get("is_connected_to_network", False)
 
         query = query.replace("\x00", "")
         inputs = args["inputs"]
@@ -145,6 +147,7 @@ class AdvancedChatAppGenerator(MessageBasedAppGenerator):
                 user_inputs=inputs, variables=app_config.variables, tenant_id=app_model.tenant_id
             ),
             query=query,
+            is_connected_to_network=is_connected_to_network,
             files=file_objs,
             # parent_message_id=args.get("parent_message_id") if invoke_from != InvokeFrom.SERVICE_API else UUID_NIL,
             parent_message_id=args.get("parent_message_id") or UUID_NIL,

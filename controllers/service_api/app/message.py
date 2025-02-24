@@ -59,6 +59,8 @@ class MessageListApi(Resource):
         "inputs": FilesContainedField,
         "query": fields.String,
         "answer": fields.String(attribute="re_sign_file_url_answer"),
+        "is_connected_to_network": fields.Boolean,
+        "network_message": fields.String,
         "message_files": fields.List(fields.Nested(message_file_fields)),
         "feedback": fields.Nested(feedback_fields, attribute="user_feedback", allow_null=True),
         "retriever_resources": fields.List(fields.Nested(retriever_resource_fields)),

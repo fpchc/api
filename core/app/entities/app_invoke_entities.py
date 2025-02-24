@@ -111,7 +111,7 @@ class EasyUIBasedAppGenerateEntity(AppGenerateEntity):
     # app config
     app_config: EasyUIBasedAppConfig
     model_conf: ModelConfigWithCredentialsEntity
-
+    is_connected_to_network: bool = False
     query: Optional[str] = None
 
     # pydantic configs
@@ -124,6 +124,7 @@ class ConversationAppGenerateEntity(AppGenerateEntity):
     """
 
     conversation_id: Optional[str] = None
+    is_connected_to_network: bool = False
     parent_message_id: Optional[str] = Field(
         default=None,
         description=(

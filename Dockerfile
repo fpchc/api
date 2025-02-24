@@ -7,7 +7,7 @@ WORKDIR /app/api
 ENV POETRY_VERSION=1.8.4
 
 # if you located in China, you can use aliyun mirror to speed up
-RUN pip install --no-cache-dir poetry==${POETRY_VERSION} -i https://mirrors.cloud.tencent.com/pypi/simple/
+RUN pip install --no-cache-dir poetry==${POETRY_VERSION} -i https://mirrors.aliyun.com/pypi/simple/
 # RUN pip install --no-cache-dir poetry==${POETRY_VERSION} -i https://mirrors.aliyun.com/pypi/simple/
 
 # RUN pip install --no-cache-dir poetry==${POETRY_VERSION}
@@ -25,7 +25,7 @@ FROM base AS packages
 # RUN sed -i 's@deb.debian.org@mirrors.aliyun.com@g' /etc/apt/sources.list.d/debian.sources
 # RUN sed -i 's@deb.debian.org@mirrors.cloud.tencent.com@g' /etc/apt/sources.list.d/debian.sources \
 
-RUN sed -i 's@deb.debian.org@mirrors.cloud.tencent.com@g' /etc/apt/sources.list.d/debian.sources \
+RUN sed -i 's@deb.debian.org@mirrors.aliyun.com@g' /etc/apt/sources.list.d/debian.sources \
     && apt-get update \
     && apt-get install -y --no-install-recommends gcc g++ libc-dev libffi-dev libgmp-dev libmpfr-dev libmpc-dev
 
@@ -56,12 +56,12 @@ WORKDIR /app/api
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl nodejs libgmp-dev libmpfr-dev libmpc-dev \
     # if you located in China, you can use aliyun mirror to speed up \
-    && echo "deb http://mirrors.cloud.tencent.com/debian testing main" > /etc/apt/sources.list \
-    # && echo "deb http://mirrors.aliyun.com/debian testing main" > /etc/apt/sources.list \
+    # && echo "deb https://mirrors.cloud.tencent.com/debian testing main" > /etc/apt/sources.list \
+    && echo "deb https://mirrors.aliyun.com/debian testing main" > /etc/apt/sources.list \
     # && echo "deb http://deb.debian.org/debian testing main" > /etc/apt/sources.list \
     && apt-get update \
     # For Security
-    && apt-get install -y --no-install-recommends expat=2.6.4-1 libldap-2.5-0 perl=5.40.0-8 libsqlite3-0=3.46.1-1 zlib1g=1:1.3.dfsg+really1.3.1-1+b1 \
+    && apt-get install -y --no-install-recommends expat=2.6.4-1 libldap-2.5-0 perl libsqlite3-0=3.46.1-1 zlib1g=1:1.3.dfsg+really1.3.1-1+b1 \
     # install a chinese font to support the use of tools like matplotlib
     && apt-get install -y fonts-noto-cjk \
     && apt-get autoremove -y \

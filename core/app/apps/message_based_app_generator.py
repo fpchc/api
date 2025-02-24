@@ -29,6 +29,7 @@ from extensions.ext_database import db
 from models import Account
 from models.enums import CreatedByRole
 from models.model import App, AppMode, AppModelConfig, Conversation, EndUser, Message, MessageFile
+from services.clients.http_client import search_query
 from services.errors.app_model_config import AppModelConfigBrokenError
 from services.errors.conversation import ConversationCompletedError, ConversationNotExistsError
 
@@ -155,6 +156,17 @@ class MessageBasedAppGenerator(BaseAppGenerator):
         else:
             from_source = "console"
             account_id = application_generate_entity.user_id
+            
+        network_query = None
+        formatted_output = None
+        if application_generate_entity.is_connected_to_network:
+            network_query = search_query(application_generate_entity.query)
+            formatted_output = f"1. 我的问题是：“{application_generate_entity.query}”\n2. 以下是我在网上找到的相关信息：\n"
+            for i, item in enumerate(network_query, 1):
+                formatted_output += f"  > **来源{i}**: {item['webName']} 文章 《{item['Title']}》\n"
+                formatted_output += f"  这篇文章详细介绍了{item['Descraption']}\n"
+                formatted_output += f"  > 来源链接: {item['Url']}\n"
+            formatted_output += f"3.请基于上述信息回答:“{application_generate_entity.query}”"
 
         if isinstance(application_generate_entity, AdvancedChatAppGenerateEntity):
             app_model_config_id = None
@@ -214,6 +226,8 @@ class MessageBasedAppGenerator(BaseAppGenerator):
             conversation_id=conversation.id,
             inputs=application_generate_entity.inputs,
             query=application_generate_entity.query or "",
+            is_connected_to_network = application_generate_entity.is_connected_to_network,
+            network_message=json.dumps(network_query) if network_query else None,
             message="",
             message_tokens=0,
             message_unit_price=0,
@@ -250,6 +264,7 @@ class MessageBasedAppGenerator(BaseAppGenerator):
             db.session.add(message_file)
             db.session.commit()
 
+        application_generate_entity.query = formatted_output
         return conversation, message
 
     def _get_conversation_introduction(self, application_generate_entity: AppGenerateEntity) -> str:
